@@ -118,7 +118,9 @@ CoreWrapper::CoreWrapper() :
 		createIntermediateNodes_(Parameters::defaultRtabmapCreateIntermediateNodes()),
 		maxMappingNodes_(Parameters::defaultGridGlobalMaxNodes()),
 		previousStamp_(0),
-		mbClient_(0)
+		mbClient_(0),
+		nbRobots_(4),
+		myId_(0)
 {
 	char * rosHomePath = getenv("ROS_HOME");
 	std::string workingDir = rosHomePath?rosHomePath:UDirectory::homeDir()+"/.ros";
@@ -212,6 +214,8 @@ void CoreWrapper::onInit()
 	{
 		NODELET_INFO("rtabmap: stereo_to_depth = %s", stereoToDepth_?"true":"false");
 	}
+	pnh.param("nb_robots", nbRobots_, nbRobots_);
+	pnh.param("myId_", myId_, myId_);
 
 	infoPub_ = nh.advertise<rtabmap_ros::Info>("info", 1);
 	mapDataPub_ = nh.advertise<rtabmap_ros::MapData>("mapData", 1);
@@ -238,6 +242,19 @@ void CoreWrapper::onInit()
 	ros::Publisher nextMetricGoal_;
 	ros::Publisher goalReached_;
 	ros::Publisher path_;
+
+	//multi-robot topics
+	kfPub_ = nh.advertise<rtabmap_ros::Keyframe>("kfListener_"+std::to_string(myId_),1);
+
+	int nR;
+	pnh.getParam("nb_robots", nR); 
+	for (int iRobot = 0 ; iRobot < nR; ++iRobot)
+	{
+		if (iRobot != myId_)
+		{
+			kfSub_.insert({iRobot, nh.subscribe("kfListener_"+std::to_string(iRobot),1, &CoreWrapper::keyframeCallback, this)});
+		}
+	}
 
 	configPath_ = uReplaceChar(configPath_, '~', UDirectory::homeDir());
 	databasePath_ = uReplaceChar(databasePath_, '~', UDirectory::homeDir());
@@ -3738,7 +3755,29 @@ void CoreWrapper::publishGlobalPath(const ros::Time & stamp)
 		}
 	}
 }
+void CoreWrapper::broadcastKeyframe(const ros::Time & stamp,
+									const rtabmap_ros::GlobalDescriptor & descKf,
+									const int localId)
+{
+	rtabmap_ros::Keyframe kfMsg;
+	kfMsg.header.frame_id = frameId_;
+	kfMsg.header.stamp = stamp;
+	kfMsg.localId = localId;
+	kfMsg.robotId = myId_;
+	kfMsg.descriptor = descKf;
+	
+	if (kfPub_.getNumSubscribers())
+	{
+		kfPub_.publish(kfMsg);
+	}
+}
 
+void CoreWrapper::keyframeCallback(const rtabmap_ros::Keyframe& msg)
+{
+	rtabmap_ros::GlobalDescriptor descriptor = msg.descriptor;
+	uint robotId = msg.robotId;
+	//TODO: Send the data to rtabmap --> update the received keyframes set accordingly
+}
 #ifdef WITH_OCTOMAP_MSGS
 #ifdef RTABMAP_OCTOMAP
 bool CoreWrapper::octomapBinaryCallback(
