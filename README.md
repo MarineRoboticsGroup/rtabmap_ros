@@ -1,3 +1,5 @@
+# RTAB-Map ROS
+
 [![Build Status](http://mrg-beast.csail.mit.edu:8080/buildStatus/icon?job=rtabmap_ros%2Fmelodic-devel)](http://://mrg-beast.csail.mit.edu:8080/job/rtabmap_ros/job/melodic-devel)
 
 
