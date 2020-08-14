@@ -1,4 +1,4 @@
-rtabmap_ros [![Build Status](https://travis-ci.org/MarineRoboticsGroup/rtabmap_ros.svg?branch=melodic-devel)](https://travis-ci.org/MarineRoboticsGroup/rtabmap_ros)
+rtabmap_ros [![Build Status](http://://mrg-beast.csail.mit.edu:8080/buildStatus/icon?job=rtabmap_ros%2Fmelodic-devel)](http://://mrg-beast.csail.mit.edu:8080/job/rtabmap_ros/job/melodic-devel)
 ===========
 
 RTAB-Map's ROS package.
