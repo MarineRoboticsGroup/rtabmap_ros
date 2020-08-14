@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rtabmap_ros/OdomInfo.h"
 #include "rtabmap_ros/AddLink.h"
 #include "rtabmap_ros/Keyframe.h"
+#include "rtabmap_ros/KeyframePacket.h"
 
 #include "MapsManager.h"
 
@@ -226,8 +227,8 @@ private:
 	void goalFeedbackCb(const move_base_msgs::MoveBaseFeedbackConstPtr& feedback);
 	void publishLocalPath(const ros::Time & stamp);
 	void publishGlobalPath(const ros::Time & stamp);
-	void broadcastKeyframe(const ros::Time & stamp, const rtabmap_ros::GlobalDescriptor & descKf, const int localId);
-	void keyframeCallback(const rtabmap_ros::Keyframe& msg);
+	bool broadcastKeyframes(const ros::Time & stamp, const int oRobotId, const std::vector<std::pair<int, std::multimap<int, cv::KeyPoint>>>& allKF);
+	void keyframeCallback(const rtabmap_ros::KeyframePacket& msg);
 
 private:
 	rtabmap::Rtabmap rtabmap_;

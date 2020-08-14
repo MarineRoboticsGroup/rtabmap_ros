@@ -1967,6 +1967,21 @@ void CoreWrapper::process(
 			}
 			else
 			{
+				//Multi-robot 
+				std::pair<int, std::set<int>> bufferIdxKF = rtabmap_.getKFBuffer();
+				std::vector<std::pair<int, std::multimap<int, cv::KeyPoint>>> bufferKF;
+				int idxReceiver = bufferIdxKF.first;
+
+				const std::map<int, std::multimap<int, cv::KeyPoint>>& localKFDescriptors(rtabmap_.getAllDescriptorsKF());
+				for(auto it = bufferIdxKF.second.begin(); it!= bufferIdxKF.second.end();++it)
+				{
+					bufferKF.push_back(std::make_pair(*it, localKFDescriptors.at(*it)));
+				}
+				if (broadcastKeyframes(stamp, idxReceiver, bufferKF))
+				{
+					rtabmap_.cleanBroadcastedKF();
+				}
+
 				// Publish local graph, info
 				this->publishStats(stamp);
 				if(localizationPosePub_.getNumSubscribers() &&
@@ -2026,7 +2041,7 @@ void CoreWrapper::process(
 						else if(onPath.empty())
 						{
 							break;
-						}
+						} 
 					}
 
 					filteredPoses = nearestPoses;
@@ -3755,28 +3770,60 @@ void CoreWrapper::publishGlobalPath(const ros::Time & stamp)
 		}
 	}
 }
-void CoreWrapper::broadcastKeyframe(const ros::Time & stamp,
-									const rtabmap_ros::GlobalDescriptor & descKf,
-									const int localId)
+bool CoreWrapper::broadcastKeyframes(const ros::Time & stamp,
+									const int oRobotId,
+									const std::vector<std::pair<int, std::multimap<int, cv::KeyPoint>>>& allKF)
 {
-	rtabmap_ros::Keyframe kfMsg;
+
+	rtabmap_ros::KeyframePacket kfMsg;
 	kfMsg.header.frame_id = frameId_;
 	kfMsg.header.stamp = stamp;
-	kfMsg.localId = localId;
-	kfMsg.robotId = myId_;
-	kfMsg.descriptor = descKf;
-	
+
+	kfMsg.nbKeyframes = allKF.size();
+	kfMsg.destId = oRobotId;
+	kfMsg.senderId = myId_;
+
+	std::vector<rtabmap_ros::Keyframe> vRosKF;
+	rtabmap_ros::KeyPoint tmpMsg;
+	rtabmap_ros::Keyframe curKF;
+	std::vector<rtabmap_ros::KeyPoint> allKeypointsMessage;
+	for (unsigned int iKeyframe = 0 ; iKeyframe < allKF.size() ; ++iKeyframe)
+	{
+
+		curKF.localId = allKF.at(iKeyframe).first;
+		for (auto it = allKF.at(iKeyframe).second.begin(); it!= allKF.at(iKeyframe).second.end();++it)
+		{
+			keypointToROS(it->second, tmpMsg);
+			allKeypointsMessage.push_back(tmpMsg);
+
+		}
+
+		curKF.descriptor = allKeypointsMessage;
+		vRosKF.push_back(curKF);
+	}
+
+	kfMsg.allKeyframes = vRosKF;
 	if (kfPub_.getNumSubscribers())
 	{
 		kfPub_.publish(kfMsg);
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
-
-void CoreWrapper::keyframeCallback(const rtabmap_ros::Keyframe& msg)
+void CoreWrapper::keyframeCallback(const rtabmap_ros::KeyframePacket& msg)
 {
-	rtabmap_ros::GlobalDescriptor descriptor = msg.descriptor;
-	uint robotId = msg.robotId;
-	//TODO: Send the data to rtabmap --> update the received keyframes set accordingly
+	uint robotId = msg.destId;
+
+	if (robotId == myId_)
+	{
+		uint nbKeyframes = msg.nbKeyframes;
+		uint otherRobot = msg.senderId; 
+		std::vector<rtabmap_ros::Keyframe> allTransmittedKF = msg.allKeyframes;
+		//TODO: Send the data to rtabmap --> update the received keyframes set accordingly
+	} 
 }
 #ifdef WITH_OCTOMAP_MSGS
 #ifdef RTABMAP_OCTOMAP

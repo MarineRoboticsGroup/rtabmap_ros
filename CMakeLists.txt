@@ -93,6 +93,7 @@ add_message_files(
    Info.msg
    KeyPoint.msg
    Keyframe.msg
+   KeyframePacket.msg
    GlobalDescriptor.msg
    ScanDescriptor.msg
    MapData.msg

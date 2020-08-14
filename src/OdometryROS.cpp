@@ -893,6 +893,7 @@ void OdometryROS::processData(const SensorData & data, const ros::Time & stamp)
 	}
 }
 
+
 bool OdometryROS::reset(std_srvs::Empty::Request&, std_srvs::Empty::Response&)
 {
 	NODELET_INFO( "visual_odometry: reset odom!");
