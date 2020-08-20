@@ -9,8 +9,10 @@ pipeline {
 		stage('Build') {
 			steps {
 				sh '''#!/bin/bash -l
-				echo 'This is where you write your build code...'
-        echo '... e.g., mkdir build & cd build & cmake .. & etc...'
+cd ..
+ls
+pwd
+catkin build
 				'''
 			}
 		}
