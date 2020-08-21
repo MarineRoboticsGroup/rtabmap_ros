@@ -1,5 +1,7 @@
-rtabmap_ros [![Build Status](https://travis-ci.org/introlab/rtabmap_ros.svg?branch=master)](https://travis-ci.org/introlab/rtabmap_ros)
-===========
+# RTAB-Map ROS
+
+[![Build Status](http://mrg-beast.csail.mit.edu:8080/buildStatus/icon?job=rtabmap_ros%2Fmelodic-devel)](http://mrg-beast.csail.mit.edu:8080/job/rtabmap_ros/job/melodic-devel/)
+
 
 RTAB-Map's ROS package.
 
