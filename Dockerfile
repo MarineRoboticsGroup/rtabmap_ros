@@ -8,6 +8,8 @@ RUN apt-get update && \
     apt-get install -y ros-melodic-rtabmap-ros && \
     apt-get remove -y ros-melodic-rtabmap
 
+RUN apt-get -y install sudo python-catkin-tools
+
 # # g2o from source
 # RUN apt-get remove -y ros-melodic-libg2o && \
 #     git clone https://github.com/RainerKuemmerle/g2o.git && \
