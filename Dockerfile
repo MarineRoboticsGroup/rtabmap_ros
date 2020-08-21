@@ -32,6 +32,7 @@ RUN cd ~ && \
      git clone https://github.com/MarineRoboticsGroup/rtabmap.git rtabmap && \
      cd ~/rtabmap && \
      git checkout master && \
+     mkdir build && \
      cd ~/rtabmap/build && \
      cmake .. && \
      make -j$(nproc) && \
