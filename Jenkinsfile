@@ -9,9 +9,8 @@ pipeline {
 		stage('Build') {
 			steps {
 				sh '''#!/bin/bash -l
-cd ..
-ls
-pwd
+catkin init
+catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
 catkin build
 				'''
 			}
