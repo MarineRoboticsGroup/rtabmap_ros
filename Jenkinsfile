@@ -9,6 +9,8 @@ pipeline {
 		stage('Build') {
 			steps {
 				sh '''#!/bin/bash -l
+mkdir -p src/rtabmap_ros
+mv -r * src/rtabmap_ros
 catkin init
 catkin config --merge-devel
 catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
