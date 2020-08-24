@@ -40,6 +40,6 @@ RUN cd ~ && \
 
 RUN cd ~ && \
    apt-get install -y ros-melodic-catkin && \
-   apt-get install -y cmake python-catkin-pkg python-empy python-nose python-setuptools libgtest-dev build-essential python-catkin-tools && \
-   /bin/bash -c "source /opt/ros/melodic/setup.bash" 
+   apt-get install -y cmake python-catkin-pkg python-empy python-nose python-setuptools libgtest-dev build-essential python-catkin-tools
 
+WORKDIR ~

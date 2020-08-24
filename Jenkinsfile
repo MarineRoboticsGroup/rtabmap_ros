@@ -10,7 +10,9 @@ pipeline {
 			steps {
 				sh '''#!/bin/bash -l
 catkin init
+catkin config --merge-devel
 catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+source /opt/ros/melodic/setup.bash
 catkin build
 				'''
 			}
