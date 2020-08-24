@@ -9,8 +9,15 @@ pipeline {
 		stage('Build') {
 			steps {
 				sh '''#!/bin/bash -l
-				echo 'This is where you write your build code...'
-        echo '... e.g., mkdir build & cd build & cmake .. & etc...'
+mkdir -p rtabmap_ros
+mv * rtabmap_ros
+mkdir -p src
+mv rtabmap_ros src
+catkin init
+catkin config --merge-devel
+catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+source /opt/ros/melodic/setup.bash
+catkin build
 				'''
 			}
 		}

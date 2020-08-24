@@ -143,6 +143,8 @@ private:
 	bool imuProcessed_;
 	double lastImuReceivedStamp_;
 	rtabmap::SensorData bufferedData_;
+	//Multi-robot stuff
+
 };
 
 }

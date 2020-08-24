@@ -60,6 +60,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "rtabmap_ros/CommonDataSubscriber.h"
 #include "rtabmap_ros/OdomInfo.h"
 #include "rtabmap_ros/AddLink.h"
+#include "rtabmap_ros/Keyframe.h"
+#include "rtabmap_ros/KeyframePacket.h"
 
 #include "MapsManager.h"
 
@@ -225,6 +227,8 @@ private:
 	void goalFeedbackCb(const move_base_msgs::MoveBaseFeedbackConstPtr& feedback);
 	void publishLocalPath(const ros::Time & stamp);
 	void publishGlobalPath(const ros::Time & stamp);
+	bool broadcastKeyframes(const ros::Time & stamp, const int oRobotId, const std::vector<std::pair<int, std::multimap<int, cv::KeyPoint>>>& allKF);
+	void keyframeCallback(const rtabmap_ros::KeyframePacket& msg);
 
 private:
 	rtabmap::Rtabmap rtabmap_;
@@ -258,7 +262,8 @@ private:
 	double genScanMaxDepth_;
 	double genScanMinDepth_;
 	int scanCloudMaxPoints_;
-
+	int nbRobots_;
+	int myId_;
 	rtabmap::Transform mapToOdom_;
 	boost::mutex mapToOdomMutex_;
 
@@ -286,6 +291,10 @@ private:
 	ros::Publisher globalPathNodesPub_;
 	ros::Publisher localPathNodesPub_;
 	std::string goalFrameId_;
+
+	//Multi-robot stuff
+	std::map<int, ros::Subscriber> kfSub_;
+	ros::Publisher kfPub_;
 
 	tf2_ros::TransformBroadcaster tfBroadcaster_;
 	tf::TransformListener tfListener_;

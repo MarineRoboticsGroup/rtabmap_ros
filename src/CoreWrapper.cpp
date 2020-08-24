@@ -118,7 +118,9 @@ CoreWrapper::CoreWrapper() :
 		createIntermediateNodes_(Parameters::defaultRtabmapCreateIntermediateNodes()),
 		maxMappingNodes_(Parameters::defaultGridGlobalMaxNodes()),
 		previousStamp_(0),
-		mbClient_(0)
+		mbClient_(0),
+		nbRobots_(4),
+		myId_(0)
 {
 	char * rosHomePath = getenv("ROS_HOME");
 	std::string workingDir = rosHomePath?rosHomePath:UDirectory::homeDir()+"/.ros";
@@ -212,6 +214,8 @@ void CoreWrapper::onInit()
 	{
 		NODELET_INFO("rtabmap: stereo_to_depth = %s", stereoToDepth_?"true":"false");
 	}
+	pnh.param("nb_robots", nbRobots_, nbRobots_);
+	pnh.param("myId_", myId_, myId_);
 
 	infoPub_ = nh.advertise<rtabmap_ros::Info>("info", 1);
 	mapDataPub_ = nh.advertise<rtabmap_ros::MapData>("mapData", 1);
@@ -238,6 +242,19 @@ void CoreWrapper::onInit()
 	ros::Publisher nextMetricGoal_;
 	ros::Publisher goalReached_;
 	ros::Publisher path_;
+
+	//multi-robot topics
+	kfPub_ = nh.advertise<rtabmap_ros::Keyframe>("kfListener_"+std::to_string(myId_),1);
+
+	int nR;
+	pnh.getParam("nb_robots", nR); 
+	for (int iRobot = 0 ; iRobot < nR; ++iRobot)
+	{
+		if (iRobot != myId_)
+		{
+			kfSub_.insert({iRobot, nh.subscribe("kfListener_"+std::to_string(iRobot),1, &CoreWrapper::keyframeCallback, this)});
+		}
+	}
 
 	configPath_ = uReplaceChar(configPath_, '~', UDirectory::homeDir());
 	databasePath_ = uReplaceChar(databasePath_, '~', UDirectory::homeDir());
@@ -1950,6 +1967,21 @@ void CoreWrapper::process(
 			}
 			else
 			{
+				//Multi-robot 
+				std::pair<int, std::set<int>> bufferIdxKF = rtabmap_.getKFBuffer();
+				std::vector<std::pair<int, std::multimap<int, cv::KeyPoint>>> bufferKF;
+				int idxReceiver = bufferIdxKF.first;
+
+				const std::map<int, std::multimap<int, cv::KeyPoint>>& localKFDescriptors(rtabmap_.getAllDescriptorsKF());
+				for(auto it = bufferIdxKF.second.begin(); it!= bufferIdxKF.second.end();++it)
+				{
+					bufferKF.push_back(std::make_pair(*it, localKFDescriptors.at(*it)));
+				}
+				if (broadcastKeyframes(stamp, idxReceiver, bufferKF))
+				{
+					rtabmap_.cleanBroadcastedKF();
+				}
+
 				// Publish local graph, info
 				this->publishStats(stamp);
 				if(localizationPosePub_.getNumSubscribers() &&
@@ -2009,7 +2041,7 @@ void CoreWrapper::process(
 						else if(onPath.empty())
 						{
 							break;
-						}
+						} 
 					}
 
 					filteredPoses = nearestPoses;
@@ -3738,7 +3770,61 @@ void CoreWrapper::publishGlobalPath(const ros::Time & stamp)
 		}
 	}
 }
+bool CoreWrapper::broadcastKeyframes(const ros::Time & stamp,
+									const int oRobotId,
+									const std::vector<std::pair<int, std::multimap<int, cv::KeyPoint>>>& allKF)
+{
 
+	rtabmap_ros::KeyframePacket kfMsg;
+	kfMsg.header.frame_id = frameId_;
+	kfMsg.header.stamp = stamp;
+
+	kfMsg.nbKeyframes = allKF.size();
+	kfMsg.destId = oRobotId;
+	kfMsg.senderId = myId_;
+
+	std::vector<rtabmap_ros::Keyframe> vRosKF;
+	rtabmap_ros::KeyPoint tmpMsg;
+	rtabmap_ros::Keyframe curKF;
+	std::vector<rtabmap_ros::KeyPoint> allKeypointsMessage;
+	for (unsigned int iKeyframe = 0 ; iKeyframe < allKF.size() ; ++iKeyframe)
+	{
+
+		curKF.localId = allKF.at(iKeyframe).first;
+		for (auto it = allKF.at(iKeyframe).second.begin(); it!= allKF.at(iKeyframe).second.end();++it)
+		{
+			keypointToROS(it->second, tmpMsg);
+			allKeypointsMessage.push_back(tmpMsg);
+
+		}
+
+		curKF.descriptor = allKeypointsMessage;
+		vRosKF.push_back(curKF);
+	}
+
+	kfMsg.allKeyframes = vRosKF;
+	if (kfPub_.getNumSubscribers())
+	{
+		kfPub_.publish(kfMsg);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+void CoreWrapper::keyframeCallback(const rtabmap_ros::KeyframePacket& msg)
+{
+	uint robotId = msg.destId;
+
+	if (robotId == myId_)
+	{
+		uint nbKeyframes = msg.nbKeyframes;
+		uint otherRobot = msg.senderId; 
+		std::vector<rtabmap_ros::Keyframe> allTransmittedKF = msg.allKeyframes;
+		//TODO: Send the data to rtabmap --> update the received keyframes set accordingly
+	} 
+}
 #ifdef WITH_OCTOMAP_MSGS
 #ifdef RTABMAP_OCTOMAP
 bool CoreWrapper::octomapBinaryCallback(
