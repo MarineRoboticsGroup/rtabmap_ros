@@ -4,7 +4,9 @@ USER root
 
 
 # Install build dependencies
-RUN apt-get update 
+RUN apt-get update && \
+    apt-get install -y ros-melodic-rtabmap ros-melodic-rtabmap-ros && \
+    apt-get remove -y ros-melodic-rtabmap ros-melodic-rtabmap-ros
 
 # g2o from source
 RUN git clone https://github.com/RainerKuemmerle/g2o.git && \
