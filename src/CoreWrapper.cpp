@@ -216,6 +216,8 @@ void CoreWrapper::onInit()
 	}
 	pnh.param("nb_robots", nbRobots_, nbRobots_);
 	pnh.param("myId_", myId_, myId_);
+	NODELET_INFO("rtabmap: nb robots = %d", nbRobots_);
+	NODELET_INFO("rtabmap: my Id = %d", myId_);
 
 	infoPub_ = nh.advertise<rtabmap_ros::Info>("info", 1);
 	mapDataPub_ = nh.advertise<rtabmap_ros::MapData>("mapData", 1);
@@ -244,7 +246,7 @@ void CoreWrapper::onInit()
 	ros::Publisher path_;
 
 	//multi-robot topics
-	kfPub_ = nh.advertise<rtabmap_ros::Keyframe>("kfListener_"+std::to_string(myId_),1);
+	kfPub_ = nh.advertise<rtabmap_ros::KeyframePacket>("/rtabmap/kfListener_"+std::to_string(myId_),1);
 
 	int nR;
 	pnh.getParam("nb_robots", nR); 
@@ -252,7 +254,7 @@ void CoreWrapper::onInit()
 	{
 		if (iRobot != myId_)
 		{
-			kfSub_.insert({iRobot, nh.subscribe("kfListener_"+std::to_string(iRobot),1, &CoreWrapper::keyframeCallback, this)});
+			kfSub_.insert({iRobot, nh.subscribe("/rtabmap/kfListener_"+std::to_string(iRobot),1, &CoreWrapper::keyframeCallback, this)});
 		}
 	}
 
@@ -1981,7 +1983,7 @@ void CoreWrapper::process(
 				{
 					rtabmap_.cleanBroadcastedKF();
 				}
-
+				
 				// Publish local graph, info
 				this->publishStats(stamp);
 				if(localizationPosePub_.getNumSubscribers() &&
@@ -3782,6 +3784,7 @@ bool CoreWrapper::broadcastKeyframes(const ros::Time & stamp,
 	kfMsg.nbKeyframes = allKF.size();
 	kfMsg.destId = oRobotId;
 	kfMsg.senderId = myId_;
+	NODELET_INFO("Sending keyframe from %d to %d", myId_, oRobotId);
 
 	std::vector<rtabmap_ros::Keyframe> vRosKF;
 	rtabmap_ros::KeyPoint tmpMsg;
