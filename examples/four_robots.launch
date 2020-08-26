@@ -23,6 +23,7 @@
 <arg name="left_image_topic" value="/cam02/image_raw_1"/>
 <arg name="right_image_topic" value="/cam03/image_raw_1/"/>
 <arg name="left_camera_info_topic" value="/cam02/camera_info_1"/>
+<arg name="right_camera_info_topic" value="/cam03/camera_info_1"/>
 <arg name="approx_sync" value="true"/>
 <arg name="use_sim_time" value="true"/>
 <arg name="frame_id" value="/imu_1"/>
@@ -41,7 +42,7 @@
 <arg name="right_camera_info_topic" value="/cam03/camera_info_2"/>
 <arg name="approx_sync" value="true"/>
 <arg name="use_sim_time" value="true"/>
-<arg name="frame_id" value="imu_2"/>
+<arg name="frame_id" value="/imu_2"/>
 <arg name="database_path" value="~/.ros/rtabmap2.db"/>
 <arg name="rtabmapviz" value="false"/>
 <arg name="rtabmap_args" value="--delete_db_on_start --Grid/CellSize 0.3 --Grid/ClusterRadius 1"/>
