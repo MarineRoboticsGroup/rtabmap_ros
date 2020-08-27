@@ -1974,7 +1974,7 @@ void CoreWrapper::process(
 				std::vector<std::pair<int, std::multimap<int, cv::KeyPoint>>> bufferKF;
 				int idxReceiver = bufferIdxKF.first;
 
-				const std::map<int, std::multimap<int, cv::KeyPoint>>& localKFDescriptors(rtabmap_.getAllDescriptorsKF());
+				const std::map<int, std::multimap<int, cv::KeyPoint>>& localKFDescriptors(rtabmap_.getMemory()->getAllDescriptorsKF());
 				for(auto it = bufferIdxKF.second.begin(); it!= bufferIdxKF.second.end();++it)
 				{
 					bufferKF.push_back(std::make_pair(*it, localKFDescriptors.at(*it)));
