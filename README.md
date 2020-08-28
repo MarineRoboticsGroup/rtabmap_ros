@@ -1,5 +1,6 @@
-rtabmap_ros [![Build Status](https://travis-ci.org/introlab/rtabmap_ros.svg?branch=master)](https://travis-ci.org/introlab/rtabmap_ros)
+rtabmap_ros 
 ===========
+[![Build Status](http://mrg-beast.csail.mit.edu:8080/buildStatus/icon?job=rtabmap_ros%2Ffeat%252Fkeyframe_communication)](http://mrg-beast.csail.mit.edu:8080/job/rtabmap_ros/job/feat%252Fkeyframe_communication)
 
 RTAB-Map's ROS package.
 
