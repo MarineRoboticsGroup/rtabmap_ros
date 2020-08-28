@@ -1,0 +1,125 @@
+<launch>
+<include file="customized_rtabmap.launch" ns="mapper0"> 
+<arg name="stereo" value="true"/>
+<arg name="left_image_topic" value="/cam02/image_raw_0"/>
+<arg name="right_image_topic" value="/cam03/image_raw_0/"/>
+<arg name="left_camera_info_topic" value="/cam02/camera_info_0"/>
+<arg name="right_camera_info_topic" value="/cam03/camera_info_0"/>
+<arg name="approx_sync" value="true"/>
+<arg name="use_sim_time" value="true"/>
+<arg name="frame_id" value="/imu_0"/>
+<arg name="rviz" value="false"/>
+<arg name="rtabmapviz" value="false"/>
+<arg name="database_path" value="~/.ros/rtabmap0.db"/>
+<arg name="rtabmap_args" value="--delete_db_on_start --Grid/CellSize 0.3 --Grid/ClusterRadius 1"/>
+<arg name="nb_robots" value="4"/>
+<arg name="my_id" value="0"/>
+</include>
+
+
+
+<include file="customized_rtabmap.launch" ns = "mapper1">
+<arg name="stereo" value="true"/>
+<arg name="left_image_topic" value="/cam02/image_raw_1"/>
+<arg name="right_image_topic" value="/cam03/image_raw_1/"/>
+<arg name="left_camera_info_topic" value="/cam02/camera_info_1"/>
+<arg name="right_camera_info_topic" value="/cam03/camera_info_1"/>
+<arg name="approx_sync" value="true"/>
+<arg name="use_sim_time" value="true"/>
+<arg name="frame_id" value="/imu_1"/>
+<arg name="database_path" value="~/.ros/rtabmap1.db"/>
+<arg name="rtabmapviz" value="false"/>
+<arg name="rtabmap_args" value="--delete_db_on_start --Grid/CellSize 0.3 --Grid/ClusterRadius 1"/>
+<arg name="nb_robots" value="4"/>
+<arg name="my_id" value="1"/>
+</include>
+
+<include file="customized_rtabmap.launch" ns = "mapper2">
+<arg name="stereo" value="true"/>
+<arg name="left_image_topic" value="/cam02/image_raw_2"/>
+<arg name="right_image_topic" value="/cam03/image_raw_2/"/>
+<arg name="left_camera_info_topic" value="/cam02/camera_info_2"/>
+<arg name="right_camera_info_topic" value="/cam03/camera_info_2"/>
+<arg name="approx_sync" value="true"/>
+<arg name="use_sim_time" value="true"/>
+<arg name="frame_id" value="/imu_2"/>
+<arg name="database_path" value="~/.ros/rtabmap2.db"/>
+<arg name="rtabmapviz" value="false"/>
+<arg name="rtabmap_args" value="--delete_db_on_start --Grid/CellSize 0.3 --Grid/ClusterRadius 1"/>
+<arg name="nb_robots" value="4"/>
+<arg name="my_id" value="2"/>
+</include>
+
+<include file="customized_rtabmap.launch" ns = "mapper3">
+<arg name="stereo" value="true"/>
+<arg name="left_image_topic" value="/cam02/image_raw_3"/>
+<arg name="right_image_topic" value="/cam03/image_raw_3/"/>
+<arg name="left_camera_info_topic" value="/cam02/camera_info_3"/>
+<arg name="right_camera_info_topic" value="/cam03/camera_info_3"/>
+<arg name="approx_sync" value="true"/>
+<arg name="use_sim_time" value="true"/>
+<arg name="frame_id" value="/imu_3"/>
+<arg name="database_path" value="~/.ros/rtabmap3.db"/>
+<arg name="rtabmapviz" value="false"/>
+<arg name="rtabmap_args" value="--delete_db_on_start --Grid/CellSize 0.3 --Grid/ClusterRadius 1"/>
+<arg name="nb_robots" value="4"/>
+<arg name="my_id" value="3"/>
+</include>
+
+<node pkg="nodelet" type="nodelet" name="points_xyzrgb" args="standalone rtabmap_ros/point_cloud_xyzrgb" ns = "mapper0">
+<remap from="left/image"        to="/cam02/image_raw_0"/>
+<remap from="right/image"       to="/cam03/image_raw_0"/>
+<remap from="left/camera_info"  to="/cam02/camera_info_0"/>
+<remap from="right/camera_info" to="/cam03/camera_info_0"/>
+<remap from="cloud"             to="voxel_cloud" />
+<param name="decimation"  type="double" value="1"/>
+<param name="voxel_size"  type="double" value="0.2"/>
+<param name="approx_sync" type="bool"   value="true"/>
+</node>
+
+<node pkg="nodelet" type="nodelet" name="points_xyzrgb" args="standalone rtabmap_ros/point_cloud_xyzrgb" ns = "mapper1">
+<remap from="left/image"        to="/cam02/image_raw_1"/>
+<remap from="right/image"       to="/cam03/image_raw_1"/>
+<remap from="left/camera_info"  to="/cam02/camera_info_1"/>
+<remap from="right/camera_info" to="/cam03/camera_info_1"/>
+<remap from="cloud"             to="voxel_cloud" />
+<param name="decimation"  type="double" value="1"/>
+<param name="voxel_size"  type="double" value="0.2"/>
+<param name="approx_sync" type="bool"   value="true"/>
+</node>
+
+<node pkg="nodelet" type="nodelet" name="points_xyzrgb" args="standalone rtabmap_ros/point_cloud_xyzrgb" ns = "mapper2">
+<remap from="left/image"        to="/cam02/image_raw_2"/>
+<remap from="right/image"       to="/cam03/image_raw_2"/>
+<remap from="left/camera_info"  to="/cam02/camera_info_2"/>
+<remap from="right/camera_info" to="/cam03/camera_info_2"/>
+<remap from="cloud"             to="voxel_cloud" />
+<param name="decimation"  type="double" value="1"/>
+<param name="voxel_size"  type="double" value="0.2"/>
+<param name="approx_sync" type="bool"   value="true"/>
+</node>
+
+<node pkg="nodelet" type="nodelet" name="points_xyzrgb" args="standalone rtabmap_ros/point_cloud_xyzrgb" ns = "mapper3">
+<remap from="left/image"        to="/cam02/image_raw_3"/>
+<remap from="right/image"       to="/cam03/image_raw_3"/>
+<remap from="left/camera_info"  to="/cam02/camera_info_3"/>
+<remap from="right/camera_info" to="/cam03/camera_info_3"/>
+<remap from="cloud"             to="voxel_cloud" />
+<param name="decimation"  type="double" value="1"/>
+<param name="voxel_size"  type="double" value="0.2"/>
+<param name="approx_sync" type="bool"   value="true"/>
+</node>
+
+<node pkg="rtabmap_ros" type="map_assembler" name="map_assembler_0">
+    <remap from="mapData" to="/mapper0/rtabmap/mapData" />
+</node>
+<node pkg="rtabmap_ros" type="map_assembler" name="map_assembler_1">
+    <remap from="mapData" to="/mapper1/rtabmap/mapData" />
+</node>
+<node pkg="rtabmap_ros" type="map_assembler" name="map_assembler_2">
+    <remap from="mapData" to="/mapper2/rtabmap/mapData" />
+</node>
+<node pkg="rtabmap_ros" type="map_assembler" name="map_assembler_3">
+    <remap from="mapData" to="/mapper3/rtabmap/mapData" />
+</node>
+</launch>

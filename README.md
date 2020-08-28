@@ -1,6 +1,6 @@
-rtabmap_ros 
-===========
-[![Build Status](http://mrg-beast.csail.mit.edu:8080/buildStatus/icon?job=rtabmap_ros%2Ffeat%252Fkeyframe_communication)](http://mrg-beast.csail.mit.edu:8080/job/rtabmap_ros/job/feat%252Fkeyframe_communication)
+# RTAB-Map ROS
+
+[![Build Status](http://mrg-beast.csail.mit.edu:8080/buildStatus/icon?job=rtabmap_ros%2Fmaster)](http://mrg-beast.csail.mit.edu:8080/job/rtabmap_ros/job/master/)
 
 RTAB-Map's ROS package.
 
