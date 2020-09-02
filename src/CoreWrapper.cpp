@@ -214,8 +214,8 @@ void CoreWrapper::onInit()
 	{
 		NODELET_INFO("rtabmap: stereo_to_depth = %s", stereoToDepth_?"true":"false");
 	}
-	pnh.param("nb_robots", nbRobots_, nbRobots_);
-	pnh.param("myId_", myId_, myId_);
+	pnh.param("Rtabmap/NbRobots", nbRobots_, nbRobots_);
+	pnh.param("Rtabmap/MyId", myId_, myId_);
 	NODELET_INFO("rtabmap: nb robots = %d", nbRobots_);
 	NODELET_INFO("rtabmap: my Id = %d", myId_);
 
@@ -306,6 +306,7 @@ void CoreWrapper::onInit()
 	// update parameters with user input parameters (private)
 	for(ParametersMap::iterator iter=allParameters.begin(); iter!=allParameters.end(); ++iter)
 	{
+
 		std::string vStr;
 		bool vBool;
 		int vInt;
@@ -935,7 +936,6 @@ bool CoreWrapper::odomUpdate(const nav_msgs::OdometryConstPtr & odomMsg, ros::Ti
 				odom = odomTF;
 			}
 		}
-
 		if(!lastPose_.isIdentity() && !odom.isNull() && (odom.isIdentity() || (odomMsg->pose.covariance[0] >= BAD_COVARIANCE && odomMsg->twist.covariance[0] >= BAD_COVARIANCE)))
 		{
 			UWARN("Odometry is reset (identity pose or high variance (%f) detected). Increment map id!", MAX(odomMsg->pose.covariance[0], odomMsg->twist.covariance[0]));
@@ -1974,7 +1974,7 @@ void CoreWrapper::process(
 				std::vector<std::pair<int, std::multimap<int, cv::KeyPoint>>> bufferKF;
 				int idxReceiver = bufferIdxKF.first;
 
-				const std::map<int, std::multimap<int, cv::KeyPoint>>& localKFDescriptors(rtabmap_.getAllDescriptorsKF());
+				const std::map<int, std::multimap<int, cv::KeyPoint>>& localKFDescriptors(rtabmap_.getMemory()->getAllDescriptorsKF());
 				for(auto it = bufferIdxKF.second.begin(); it!= bufferIdxKF.second.end();++it)
 				{
 					bufferKF.push_back(std::make_pair(*it, localKFDescriptors.at(*it)));
@@ -2156,6 +2156,13 @@ void CoreWrapper::process(
 		{
 			timeRtabmap = timer.ticks();
 		}
+		
+		if (odomInfo.keyFrameAdded)
+		{
+			NODELET_INFO("New keyframe, update + broadcast to all robots");
+			rtabmap_.UpdateNCommunicateKF(odomInfo.words);
+		}
+		
 		NODELET_INFO("rtabmap (%d): Rate=%.2fs, Limit=%.3fs, RTAB-Map=%.4fs, Maps update=%.4fs pub=%.4fs (local map=%d, WM=%d)",
 				rtabmap_.getLastLocationId(),
 				rate_>0?1.0f/rate_:0,

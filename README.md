@@ -2,7 +2,6 @@
 
 [![Build Status](http://mrg-beast.csail.mit.edu:8080/buildStatus/icon?job=rtabmap_ros%2Fmaster)](http://mrg-beast.csail.mit.edu:8080/job/rtabmap_ros/job/master/)
 
-
 RTAB-Map's ROS package.
 
 For more information, demos and tutorials about this package, visit [rtabmap_ros](http://wiki.ros.org/rtabmap_ros) page on ROS wiki.

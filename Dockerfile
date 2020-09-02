@@ -29,7 +29,7 @@ RUN cd ~ && \
 RUN cd ~ && \
      git clone https://github.com/MarineRoboticsGroup/rtabmap.git rtabmap && \
      cd ~/rtabmap && \
-     git checkout master && \
+     git checkout feat/keyframe_communication && \
      mkdir build && \
      cd ~/rtabmap/build && \
      cmake .. && \
