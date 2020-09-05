@@ -492,6 +492,42 @@ void linkToROS(const rtabmap::Link & link, rtabmap_ros::Link & msg)
 	transformToGeometryMsg(link.transform(), msg.transform);
 }
 
+std::multimap<int, cv::KeyPoint> keyframeFromROS(const rtabmap_ros::Keyframe & msg)
+{
+	std::vector<int> allIds(msg.ids.size());
+	for (unsigned int i = 0 ; i < msg.ids.size(); ++i)
+	{
+		allIds.at(i) = msg.ids[i];
+	}
+	
+	std::vector<cv::KeyPoint> keypoints = keypointsFromROS(msg.descriptor);
+	std::multimap<int, cv::KeyPoint> result;
+	for (int i = 0 ; i < keypoints.size();++i)
+	{
+		result.insert({allIds.at(i), keypoints.at(i)});
+	}
+
+	return result;
+}
+rtabmap_ros::Keyframe keyframeToROS(const std::multimap<int, cv::KeyPoint> & kf)
+{
+	rtabmap_ros::Keyframe msg;
+	std::vector<cv::KeyPoint> keypoints;
+	std::vector<rtabmap_ros::KeyPoint> rosKeypoints;
+	std::vector<unsigned short int> ids;
+
+	for (auto it = kf.begin() ; it != kf.end() ; ++it)
+	{
+		ids.push_back(static_cast<unsigned short int>(it->first));
+		keypoints.push_back(it->second);
+	}
+
+	keypointsToROS(keypoints, rosKeypoints);
+	msg.ids = ids;
+	msg.descriptor = rosKeypoints;
+
+}
+
 cv::KeyPoint keypointFromROS(const rtabmap_ros::KeyPoint & msg)
 {
 	return cv::KeyPoint(msg.pt.x, msg.pt.y, msg.size, msg.angle, msg.response, msg.octave, msg.class_id);
