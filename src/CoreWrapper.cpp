@@ -248,9 +248,7 @@ void CoreWrapper::onInit()
 	//multi-robot topics
 	kfPub_ = nh.advertise<rtabmap_ros::KeyframePacket>("/rtabmap/kfListener_"+std::to_string(myId_),1);
 
-	int nR;
-	pnh.getParam("nb_robots", nR); 
-	for (int iRobot = 0 ; iRobot < nR; ++iRobot)
+	for (int iRobot = 0 ; iRobot < nbRobots_; ++iRobot)
 	{
 		if (iRobot != myId_)
 		{
