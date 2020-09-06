@@ -119,7 +119,7 @@ CoreWrapper::CoreWrapper() :
 		maxMappingNodes_(Parameters::defaultGridGlobalMaxNodes()),
 		previousStamp_(0),
 		mbClient_(0),
-		nbRobots_(4),
+		nbRobots_(1),
 		myId_(0)
 {
 	char * rosHomePath = getenv("ROS_HOME");
@@ -248,9 +248,7 @@ void CoreWrapper::onInit()
 	//multi-robot topics
 	kfPub_ = nh.advertise<rtabmap_ros::KeyframePacket>("/rtabmap/kfListener_"+std::to_string(myId_),1);
 
-	int nR;
-	pnh.getParam("nb_robots", nR); 
-	for (int iRobot = 0 ; iRobot < nR; ++iRobot)
+	for (int iRobot = 0 ; iRobot < nbRobots_; ++iRobot)
 	{
 		if (iRobot != myId_)
 		{
