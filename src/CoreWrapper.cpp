@@ -3799,16 +3799,8 @@ bool CoreWrapper::broadcastKeyframes(const ros::Time & stamp,
 	std::vector<rtabmap_ros::KeyPoint> allKeypointsMessage;
 	for (unsigned int iKeyframe = 0 ; iKeyframe < allKF.size() ; ++iKeyframe)
 	{
-
+		curKF = keyframeToROS(allKF.at(iKeyframe).second);
 		curKF.localId = allKF.at(iKeyframe).first;
-		for (auto it = allKF.at(iKeyframe).second.begin(); it!= allKF.at(iKeyframe).second.end();++it)
-		{
-			keypointToROS(it->second, tmpMsg);
-			allKeypointsMessage.push_back(tmpMsg);
-
-		}
-
-		curKF.descriptor = allKeypointsMessage;
 		vRosKF.push_back(curKF);
 	}
 
@@ -3825,14 +3817,20 @@ bool CoreWrapper::broadcastKeyframes(const ros::Time & stamp,
 }
 void CoreWrapper::keyframeCallback(const rtabmap_ros::KeyframePacket& msg)
 {
-	uint robotId = msg.destId;
+	int robotId = msg.destId;
 
 	if (robotId == myId_)
 	{
 		uint nbKeyframes = msg.nbKeyframes;
 		uint otherRobot = msg.senderId; 
 		std::vector<rtabmap_ros::Keyframe> allTransmittedKF = msg.allKeyframes;
-		//TODO: Send the data to rtabmap --> update the received keyframes set accordingly
+
+		for (auto it = allTransmittedKF.begin(); it!=allTransmittedKF.end() ; ++it)
+		{
+			std::multimap<int, cv::KeyPoint> curWords = keyframeFromROS(*it);
+			std::pair<std::multimap<int, cv::KeyPoint>, int> kfPair = std::make_pair(curWords, int(robotId));
+			rtabmap_.addToReceivedKFBuffer(kfPair);
+		}
 	} 
 }
 #ifdef WITH_OCTOMAP_MSGS
