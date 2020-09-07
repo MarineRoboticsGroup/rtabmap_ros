@@ -2,7 +2,7 @@ pipeline {
 	agent { 
 		dockerfile {
 			args '-e HOME=$WORKSPACE'
-			additionalBuildArgs '--build-arg USER_ID=$(id -u)'
+			additionalBuildArgs '--no-cache --build-arg USER_ID=$(id -u)'
 		}
 	}
 	stages {

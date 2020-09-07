@@ -1968,20 +1968,22 @@ void CoreWrapper::process(
 			else
 			{
 				//Multi-robot 
-				std::pair<int, std::set<int>> bufferIdxKF = rtabmap_.getKFBuffer();
-				std::vector<std::pair<int, std::multimap<int, cv::KeyPoint>>> bufferKF;
-				int idxReceiver = bufferIdxKF.first;
+				std::pair<int, std::set<int>>  bufferIdxKF = rtabmap_.getMemory()->getBufferKF();
 
-				const std::map<int, std::multimap<int, cv::KeyPoint>>& localKFDescriptors(rtabmap_.getMemory()->getAllDescriptorsKF());
-				for(auto it = bufferIdxKF.second.begin(); it!= bufferIdxKF.second.end();++it)
+				if (bufferIdxKF.second.size() > 0)
 				{
-					bufferKF.push_back(std::make_pair(*it, localKFDescriptors.at(*it)));
+					std::vector<std::pair<int, std::multimap<int, cv::KeyPoint>>> bufferKF;
+					int idxReceiver = bufferIdxKF.first;
+					const std::map<int, std::multimap<int, cv::KeyPoint>>& localKFDescriptors(rtabmap_.getMemory()->getAllDescriptorsKF());
+					for(auto it = bufferIdxKF.second.begin(); it!= bufferIdxKF.second.end();++it)
+					{
+						bufferKF.push_back(std::make_pair(*it, localKFDescriptors.at(*it)));
+					}
+					if (broadcastKeyframes(stamp, idxReceiver, bufferKF))
+					{
+						rtabmap_.cleanBroadcastedKF();
+					}
 				}
-				if (broadcastKeyframes(stamp, idxReceiver, bufferKF))
-				{
-					rtabmap_.cleanBroadcastedKF();
-				}
-				
 				// Publish local graph, info
 				this->publishStats(stamp);
 				if(localizationPosePub_.getNumSubscribers() &&
